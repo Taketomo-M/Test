@@ -1,79 +1,81 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            商品新規登録
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight text-center">
+        商品新規登録画面
         </h2>
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
-                    @include('partials.messages')
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white shadow-md rounded px-8 pt-6 pb-8">
+                
+                {{-- フラッシュメッセージ（登録後用に追加） --}}
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
 
-                    <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
+                {{-- バリデーションエラー --}}
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
 
-                        <div class="mb-4">
-                            <label for="name" class="block font-medium text-sm text-gray-700">商品名</label>
-                            <input type="text" id="name" name="name" value="{{ old('name') }}" class="form-input rounded-md shadow-sm mt-1 block w-full @error('name') border-red-500 @enderror">
-                            @error('name')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+                <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
 
-                        <div class="mb-4">
-                            <label for="company_id" class="block font-medium text-sm text-gray-700">メーカー</label>
-                            <select name="company_id" id="company_id" class="form-select rounded-md shadow-sm mt-1 block w-full @error('company_id') border-red-500 @enderror">
-                                <option value="">選択してください</option>
-                                @foreach ($companies as $company)
-                                    <option value="{{ $company->id }}" {{ old('company_id') == $company->id ? 'selected' : '' }}>
-                                        {{ $company->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('company_id')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">商品名<span class="text-danger">*</span></label>
+                        <input type="text" name="product_name" class="form-control" value="{{ old('product_name') }}" required>
+                    </div>
 
-                        <div class="mb-4">
-                            <label for="price" class="block font-medium text-sm text-gray-700">価格</label>
-                            <input type="number" id="price" name="price" value="{{ old('price') }}" class="form-input rounded-md shadow-sm mt-1 block w-full @error('price') border-red-500 @enderror">
-                            @error('price')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">メーカー名<span class="text-danger">*</span></label>
+                        <select name="company_id" class="form-select" required>
+                            <option value="">-- 選択してください --</option>
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}" {{ old('company_id') == $company->id ? 'selected' : '' }}>
+                                    {{ $company->company_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                        <div class="mb-4">
-                            <label for="stock" class="block font-medium text-sm text-gray-700">在庫</label>
-                            <input type="number" id="stock" name="stock" value="{{ old('stock') }}" class="form-input rounded-md shadow-sm mt-1 block w-full @error('stock') border-red-500 @enderror">
-                            @error('stock')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">価格<span class="text-danger">*</span></label>
+                        <input type="number" name="price" class="form-control" value="{{ old('price') }}" required>
+                    </div>
 
-                        <div class="mb-4">
-                            <label for="comment" class="block font-medium text-sm text-gray-700">コメント</label>
-                            <textarea id="comment" name="comment" class="form-input rounded-md shadow-sm mt-1 block w-full @error('comment') border-red-500 @enderror">{{ old('comment') }}</textarea>
-                            @error('comment')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">在庫数<span class="text-danger">*</span></label>
+                        <input type="number" name="stock" class="form-control" value="{{ old('stock') }}" required>
+                    </div>
 
-                        <div class="mb-4">
-                            <label for="image" class="block font-medium text-sm text-gray-700">商品画像</label>
-                            <input type="file" id="image" name="image" class="form-input rounded-md shadow-sm mt-1 block w-full @error('image') border-red-500 @enderror">
-                            @error('image')
-                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">コメント</label>
+                        <textarea name="comment" class="form-control">{{ old('comment') }}</textarea>
+                    </div>
 
-                        <div class="flex justify-center mt-6">
-                            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">登録</button>
-                        </div>
-                    </form>
+                    <div class="mb-3">
+                        <label class="form-label">商品画像</label>
+                        <input type="file" name="image" class="form-control">
+                    </div>
+                    <div class="text-start">
+                    <button type="submit" class="btn btn-warning">登録</button>
+                    <a href="{{ route('product.index') }}" class="btn btn-secondary me-2">戻る</a>
                 </div>
+
+
+                </form>
+
             </div>
         </div>
     </div>

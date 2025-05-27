@@ -1,68 +1,95 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight text-center">
-            商品情報編集画面
+        商品情報編集画面
         </h2>
     </x-slot>
 
-    <div class="container py-4">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow">
-                    <div class="card-body">
-                        <form method="POST" action="{{ route('product.update', $product->id) }}" enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
+    <div class="py-8">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
 
-                            <div class="mb-3">
-                                <label class="form-label"><strong>ID：</strong></label>
-                                <div>{{ $product->id }}</div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="name" class="form-label">商品名 <span class="text-danger">*</span></label>
-                                <input type="text" name="name" id="name" class="form-control" value="{{ old('name', $product->name) }}" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="company_id" class="form-label">メーカー名 <span class="text-danger">*</span></label>
-                                <select name="company_id" id="company_id" class="form-select" required>
-                                    <option value="">選択してください</option>
-                                    @foreach($companies as $company)
-                                        <option value="{{ $company->id }}" {{ old('company_id', $product->company_id) == $company->id ? 'selected' : '' }}>
-                                            {{ $company->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="price" class="form-label">価格 <span class="text-danger">*</span></label>
-                                <input type="number" name="price" id="price" class="form-control" value="{{ old('price', $product->price) }}" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="stock" class="form-label">在庫数 <span class="text-danger">*</span></label>
-                                <input type="number" name="stock" id="stock" class="form-control" value="{{ old('stock', $product->stock) }}" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="comment" class="form-label">コメント</label>
-                                <textarea name="comment" id="comment" class="form-control" rows="3">{{ old('comment', $product->comment) }}</textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="image" class="form-label">商品画像</label>
-                                <input type="file" name="image" id="image" class="form-control">
-                            </div>
-
-                            <div class="d-flex justify-content-between">
-                                <button type="submit" class="btn btn-warning">更新</button>
-                                <a href="{{ route('product.show', $product->id) }}" class="btn btn-info">戻る</a>
-                            </div>
-                        </form>
+                {{-- 成功メッセージ --}}
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="閉じる"></button>
                     </div>
-                </div>
+                @endif
+
+                {{-- バリデーションエラー --}}
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="閉じる"></button>
+                    </div>
+                @endif
+
+                <form action="{{ route('product.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="mb-3">
+                        <label class="form-label">商品名<span class="text-danger">*</span></label>
+                        <input type="text" name="product_name" class="form-control" value="{{ old('product_name', $product->product_name) }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">メーカー名<span class="text-danger">*</span></label>
+                        <select name="company_id" class="form-select">
+                            @foreach ($companies as $company)
+                                <option value="{{ $company->id }}" {{ $company->id == old('company_id', $product->company_id) ? 'selected' : '' }}>
+                                    {{ $company->company_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">価格<span class="text-danger">*</span></label>
+                        <input type="number" name="price" class="form-control" value="{{ old('price', $product->price) }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">在庫数<span class="text-danger">*</span></label>
+                        <input type="number" name="stock" class="form-control" value="{{ old('stock', $product->stock) }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">コメント</label>
+                        <textarea name="comment" class="form-control" rows="3">{{ old('comment', $product->comment) }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">現在の画像</label><br>
+                        @if ($product->img_path)
+                            <img src="{{ asset('storage/' . $product->img_path) }}" alt="商品画像" class="img-thumbnail mb-2" width="200">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="delete_image" id="deleteImage">
+                                <label class="form-check-label" for="deleteImage">画像を削除する</label>
+                            </div>
+                        @else
+                            <p>画像なし</p>
+                        @endif
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">画像を変更する</label>
+                        <input type="file" name="image" class="form-control">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">更新する</button>
+                    <a href="{{ route('product.show', $product->id) }}" class="btn btn-secondary">戻る</a>
+
+</div>
+
+                </form>
+
             </div>
         </div>
     </div>

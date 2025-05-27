@@ -15,13 +15,15 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('name');         // 商品名
-            $table->string('maker');        // メーカー名
-            $table->integer('price');       // 価格
-            $table->integer('stock');       // 在庫数
-            $table->text('comment')->nullable(); // コメント
-            $table->string('image')->nullable(); // 画像パス
+            $table->string('product_name');
+            $table->unsignedBigInteger('company_id');
+            $table->integer('price');
+            $table->integer('stock');
+            $table->text('comment')->nullable();
+            $table->string('img_path')->nullable();
             $table->timestamps();
+
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
         });
     }
 

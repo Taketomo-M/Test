@@ -13,15 +13,15 @@ return new class extends Migration
      */
     public function up()
 {
-    Schema::table('products', function (Blueprint $table) {
-        $table->string('image_path')->nullable();
+    Schema::table('users', function (Blueprint $table) {
+        $table->string('name')->nullable()->change();
     });
 }
 
 public function down()
 {
-    Schema::table('products', function (Blueprint $table) {
-        $table->dropColumn('image_path');
+    Schema::table('users', function (Blueprint $table) {
+        $table->string('name')->nullable(false)->change();
     });
 }
 

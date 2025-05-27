@@ -13,8 +13,10 @@ return new class extends Migration
      */
     public function up()
 {
-    Schema::table('products', function (Blueprint $table) {
-        $table->foreignId('company_id')->constrained()->onDelete('cascade');
+    Schema::create('companies', function (Blueprint $table) {
+        $table->id();
+        $table->string('company_name');
+        $table->timestamps();
     });
 }
 
@@ -26,8 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('products', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('companies');
     }
 };
