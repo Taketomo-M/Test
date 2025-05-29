@@ -66,16 +66,19 @@
 
                     <div class="mb-3">
                         <label class="form-label">現在の画像</label><br>
-                        @if ($product->img_path)
-                            <img src="{{ asset('storage/' . $product->img_path) }}" alt="商品画像" class="img-thumbnail mb-2" width="200">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="delete_image" id="deleteImage">
-                                <label class="form-check-label" for="deleteImage">画像を削除する</label>
-                            </div>
-                        @else
-                            <p>画像なし</p>
-                        @endif
-                    </div>
+@if ($product->img_path)
+    <img src="{{ asset('storage/' . $product->img_path) }}" alt="商品画像" class="img-thumbnail mb-2" width="200">
+    
+    {{-- 画像削除用の hidden + checkbox --}}
+    <input type="hidden" name="delete_image" value="0">
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="delete_image" value="1" id="deleteImage">
+        <label class="form-check-label" for="deleteImage">画像を削除する</label>
+    </div>
+@else
+    <p>画像なし</p>
+@endif
+
 
                     <div class="mb-3">
                         <label class="form-label">画像を変更する</label>
