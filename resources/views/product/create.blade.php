@@ -29,7 +29,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data" novalidate>
                     @csrf
 
                     <div class="mb-3">
