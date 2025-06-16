@@ -23,6 +23,23 @@ class ProductController extends Controller
             $query->where('company_id', $request->input('company_id'));
         }
 
+        if ($request->filled('price_min')) {
+    $query->where('price', '>=', $request->input('price_min'));
+}
+
+if ($request->filled('price_max')) {
+    $query->where('price', '<=', $request->input('price_max'));
+}
+
+if ($request->filled('stock_min')) {
+    $query->where('stock', '>=', $request->input('stock_min'));
+}
+
+if ($request->filled('stock_max')) {
+    $query->where('stock', '<=', $request->input('stock_max'));
+}
+
+
         $products = $query->paginate(10);
         $companies = Company::all();
 
@@ -35,7 +52,7 @@ class ProductController extends Controller
         return view('product.create', compact('companies'));
     }
 
-    public function store(StoreProductRequest $request)
+public function store(StoreProductRequest $request)
 {
     try {
         $validated = $request->validated();
@@ -52,6 +69,7 @@ class ProductController extends Controller
         return back()->withErrors('登録中にエラーが発生しました')->withInput();
     }
 }
+
     public function edit(Product $product)
     {
         $companies = Company::all();
@@ -92,14 +110,61 @@ public function update(UpdateProductRequest $request, Product $product)
 
         $product->delete();
 
+        if (request()->ajax()) {
+            return response()->json(['message' => '削除成功']);
+        }
+
         return redirect()->route('product.index')->with('success', '商品を削除しました');
     } catch (\Exception $e) {
+        if (request()->ajax()) {
+            return response()->json(['error' => '削除中にエラーが発生しました'], 500);
+        }
+
         return back()->with('error', '削除中にエラーが発生しました: ' . $e->getMessage());
     }
-}public function show(Product $product)
+}
+
+
+public function show(Product $product)
 {
+    
     return view('product.show', compact('product'));
 }
+
+public function search(Request $request)
+{
+    $query = Product::with('company');
+
+    if ($request->filled('keyword')) {
+        $query->where('product_name', 'like', '%' . $request->input('keyword') . '%');
+    }
+
+    if ($request->filled('company_id')) {
+        $query->where('company_id', $request->input('company_id'));
+    }
+
+    if ($request->filled('price_min')) {
+        $query->where('price', '>=', $request->input('price_min'));
+    }
+
+    if ($request->filled('price_max')) {
+        $query->where('price', '<=', $request->input('price_max'));
+    }
+
+    if ($request->filled('stock_min')) {
+        $query->where('stock', '>=', $request->input('stock_min'));
+    }
+
+    if ($request->filled('stock_max')) {
+        $query->where('stock', '<=', $request->input('stock_max'));
+    }
+
+    $products = $query->paginate(10)->withQueryString();
+    $companies = Company::all();
+
+    return view('product.index', compact('products', 'companies'));
+}
+
 
 
 }
